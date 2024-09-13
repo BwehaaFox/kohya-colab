@@ -1,15 +1,18 @@
-try:
+import multiprocessing
+
+def worker():
+
+  try:
     from sdxl_train_network import setup_parser, SdxlNetworkTrainer
     from library.train_util import read_config_from_file
 
     parser = setup_parser()
     args = parser.parse_args()
     args = read_config_from_file(args, parser)
-
     trainer = SdxlNetworkTrainer()
     trainer.train(args)
 
-except BaseException:
+  except BaseException:
     import sys
     import traceback
     import re
@@ -34,3 +37,9 @@ except BaseException:
       print(f"\033[0;31m\033[1m{tb_error}\n")
 
     sys.exit(1)
+
+if __name__ == '__main__':
+    multiprocessing.freeze_support()  # For multiprocessing support
+    p = multiprocessing.Process(target=worker)
+    p.start()
+    p.join()
